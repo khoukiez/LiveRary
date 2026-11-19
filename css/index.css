@@ -12,6 +12,12 @@
     gap: 24px;
 }
 
+.page-heading p {
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 720px;
+}
+
 .data-notice {
     width: 100%;
     box-sizing: border-box;
@@ -95,7 +101,7 @@
 }
 
 .section-label {
-    color: #c4ad78;
+    color: var(--gold);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 2px;
@@ -189,11 +195,12 @@
     border-color: #b6a16e;
 }
 
+
 .tab.active,
 .area-tab.active {
-    background: #FFD444 ;
-    border-color: #FFD444 ;
-    color: #24231e;
+    background-color: var(--azure);
+    color: var(--cream);
+    border: 1px solid var(--azure);
 }
 
 .closed-card {
@@ -311,7 +318,7 @@
 }
 
 .progress-fill.green {
-    background: #117735 ;
+    background: #104a6b ;
 }
 
 .progress-fill.gold {
