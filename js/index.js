@@ -350,7 +350,7 @@ function updateSummary() {
         : "No available data";
 
     overallProgress.style.width = overallPercentage !== null
-        ? `${overallPercentage}%`
+        ? `${Math.min(overallPercentage, 100)}%`
         : "0%";
 
     seatSummary.textContent = seatTotal > 0
@@ -358,17 +358,21 @@ function updateSummary() {
         : "No occupancy data available at this time.";
 
     busiestArea.textContent = busiest ? busiest.name : "—";
+
     busiestFloor.textContent = busiest
-        ? `${busiest.floor} - ${busiest.occupied ?? "—"} of ${busiest.total ?? "—"} seats`
+        ? `${busiest.floor} · ${busiest.occupied ?? "—"} of ${busiest.total ?? "—"} seats`
         : "No data available";
+
     busiestRate.textContent = busiest
         ? `${busiest.rate.toFixed(1)}% occupied`
         : "";
 
     freestArea.textContent = freest ? freest.name : "—";
+
     freestFloor.textContent = freest
-        ? `${freest.floor} - ${freest.occupied ?? "—"} of ${freest.total ?? "—"} seats`
+        ? `${freest.floor} · ${freest.occupied ?? "—"} of ${freest.total ?? "—"} seats`
         : "No data available";
+
     freestRate.textContent = freest
         ? `${freest.rate.toFixed(1)}% occupied`
         : "";
