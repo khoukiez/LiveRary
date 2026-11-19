@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiveRARY | Patterns and Trends</title>
+
+    <link rel="icon" type="image" href="../mmedia/img/liveRARY_logo.png">
+    <link rel="stylesheet" href="../css/patternsandtrends.css">
+    <link rel="stylesheet" href="../css/general.css">
+</head>
+
+<body>
+    <header class="hero">
+        <div class="hero-top">
+            <div>
+                <img src="../mmedia/img/liveRARY_logo.png">
+                <p class="eyebrow">NEW RIZAL LIBRARY</p>
+            </div>
+        </div>
+
+        <nav class="navigation">
+            <a href="../index.html" class="nav-link">Overview</a>
+            <a href="https://rizal.library.ateneo.edu" class="nav-link">New Rizal Library</a>
+            <a href="patternsandtrends.html" class="nav-link active">Patterns and Trends</a>
+        </nav>
+    </header>
+
+    <main class="trends-container">
+
+        <section class="page-heading">
+            <h1>Patterns <span>&</span> Trends</h1>
+            <p>
+                Explore how study-space occupancy changes across weekdays
+                and discover which areas tend to be busier.
+            </p>
+        </section>
+
+        <section class="controls panel">
+
+            <div class="control-group">
+                <label for="weekday-select">Compare weekdays</label>
+                <select id="weekday-select">
+                    <option value="All">All weekdays</option>
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="floor-select">Floor</label>
+                <select id="floor-select">
+                    <option value="All">All floors</option>
+                    <option value="1">Floor 1</option>
+                    <option value="2">Floor 2</option>
+                    <option value="3">Floor 3</option>
+                    <option value="4">Floor 4</option>
+                    <option value="5">Floor 5</option>
+                </select>
+            </div>
+
+            <button id="refresh-button" type="button">
+                Refresh data
+            </button>
+
+        </section>
+
+        <p id="data-status" class="data-status" role="status">
+            Loading occupancy data...
+        </p>
+
+        <section class="summary-grid">
+
+            <article class="summary-card panel">
+                <p>Average occupancy</p>
+                <h2 id="average-occupancy">—</h2>
+                <span>Across displayed areas</span>
+            </article>
+
+            <article class="summary-card panel">
+                <p>Busiest study area</p>
+                <h2 id="busiest-area">—</h2>
+                <span id="busiest-detail">Waiting for data</span>
+            </article>
+
+            <article class="summary-card panel">
+                <p>Least occupied area</p>
+                <h2 id="freest-area">—</h2>
+                <span id="freest-detail">Waiting for data</span>
+            </article>
+
+            <article class="summary-card panel">
+                <p>Areas recorded</p>
+                <h2 id="areas-count">—</h2>
+                <span>Unique study areas</span>
+            </article>
+
+        </section>
+
+        <section class="panel chart-panel">
+
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">WEEKLY PATTERNS</p>
+                    <h2>Occupancy across weekdays</h2>
+                </div>
+
+                <span class="chart-unit">Percent (%)</span>
+            </div>
+
+            <p class="section-description">
+                Select a study area and observation time to compare
+                its recorded occupancy across different weekdays.
+            </p>
+
+            <div class="control-group area-picker">
+                <label for="area-select">Study area</label>
+                <select id="area-select">
+                    <option value="">Select a study area</option>
+                </select>
+            </div>
+
+            <div class="control-group time-picker">
+                <label for="time-select">Observation time</label>
+                <select id="time-select">
+                    <option value="">Select a time</option>
+                </select>
+            </div>
+
+            <div id="weekday-chart" class="weekday-chart">
+                <p class="empty-state">
+                    Loading weekday comparison...
+                </p>
+            </div>
+
+            <p id="trend-note" class="trend-note"></p>
+
+        </section>
+
+        <section class="panel table-panel">
+
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">RAW OBSERVATIONS</p>
+                    <h2>Occupancy records</h2>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Weekday</th>
+                            <th>Time</th>
+                            <th>Floor</th>
+                            <th>Study Area</th>
+                            <th>Occupied</th>
+                            <th>Available</th>
+                            <th>Occupancy</th>
+                        </tr>
+                    </thead>
+                    <tbody id="records-table"></tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <p class="page-note">
+            Occupancy percentages are based on the data available
+            in the published Google Sheet. Comparisons reflect recorded
+            observations and do not necessarily represent every moment
+            of the day.
+        </p>
+
+    </main>
+
+    <script src="../js/patternsandtrends.js"></script>
+</body>
+</html>
