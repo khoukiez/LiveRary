@@ -7,8 +7,8 @@
     <title>LiveRARY | Patterns and Trends</title>
 
     <link rel="icon" type="image" href="../mmedia/img/liveRARY_logo.png">
-    <link rel="stylesheet" href="../css/patternsandtrends.css">
     <link rel="stylesheet" href="../css/general.css">
+    <link rel="stylesheet" href="../css/patternsandtrends.css">
 </head>
 
 <body>
@@ -22,8 +22,8 @@
 
         <nav class="navigation">
             <a href="../index.html" class="nav-link">Overview</a>
-            <a href="https://rizal.library.ateneo.edu" class="nav-link">New Rizal Library</a>
             <a href="patternsandtrends.html" class="nav-link active">Patterns and Trends</a>
+            <a href="https://rizal.library.ateneo.edu" class="nav-link">New Rizal Library</a>
         </nav>
     </header>
 
@@ -32,8 +32,7 @@
         <section class="page-heading">
             <h1>Patterns <span>&</span> Trends</h1>
             <p>
-                Explore how study-space occupancy changes across weekdays
-                and discover which areas tend to be busier.
+                Check the recurring paterns and trends in New Rizal Library!
             </p>
         </section>
 
@@ -75,34 +74,36 @@
             Loading occupancy data...
         </p>
 
+        <!-- SUMMARY CARDS -->
         <section class="summary-grid">
 
             <article class="summary-card panel">
-                <p>Average occupancy</p>
-                <h2 id="average-occupancy">—</h2>
-                <span>Across displayed areas</span>
+                <p>Quietest Time & Place</p>
+                <h2 id="quietest-time">—</h2>
+                <span id="quietest-detail">Waiting for data</span>
             </article>
 
             <article class="summary-card panel">
-                <p>Busiest study area</p>
-                <h2 id="busiest-area">—</h2>
+                <p>Busiest Time & Place</p>
+                <h2 id="busiest-time">—</h2>
                 <span id="busiest-detail">Waiting for data</span>
             </article>
 
             <article class="summary-card panel">
-                <p>Least occupied area</p>
-                <h2 id="freest-area">—</h2>
-                <span id="freest-detail">Waiting for data</span>
+                <p>Areas Recorded</p>
+                <h2 id="areas-count">—</h2>
+                <span id="areas-detail">Unique study areas</span>
             </article>
 
             <article class="summary-card panel">
-                <p>Areas recorded</p>
-                <h2 id="areas-count">—</h2>
-                <span>Unique study areas</span>
+                <p>Average Available Seats</p>
+                <h2 id="average-available-seats">—</h2>
+                <span id="average-available-detail">Waiting for data</span>
             </article>
 
         </section>
 
+        <!-- WEEKDAY COMPARISON CHART -->
         <section class="panel chart-panel">
 
             <div class="section-heading">
@@ -143,6 +144,7 @@
 
         </section>
 
+        <!-- COMPLETE OCCUPANCY RECORDS -->
         <section class="panel table-panel">
 
             <div class="section-heading">

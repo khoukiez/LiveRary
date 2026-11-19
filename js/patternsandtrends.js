@@ -21,6 +21,10 @@ const timeSelect = document.getElementById("time-select");
 const statusText = document.getElementById("data-status");
 const refreshButton = document.getElementById("refresh-button");
 
+/* ==============================
+   CSV PROCESSING
+============================== */
+
 function parseCSV(csv) {
     const rows = [];
     let row = [];
@@ -89,6 +93,10 @@ function parsePercentage(value) {
     return number;
 }
 
+/* ==============================
+   TIME FORMATTING
+============================== */
+
 function timeToMinutes(time) {
     if (!time) return -1;
 
@@ -142,6 +150,10 @@ function formatTime(time) {
 
     return `${displayHour}:${String(remainingMinutes).padStart(2, "0")} ${period}`;
 }
+
+/* ==============================
+   FETCH GOOGLE SHEETS DATA
+============================== */
 
 async function fetchRecords() {
     const response = await fetch(CSV_URL, {
@@ -230,34 +242,9 @@ async function fetchRecords() {
         }));
 }
 
-/* Keeps only the latest observation per area.
-   Used for summary cards only. */
-
-function latestPerArea(records) {
-    const latest = new Map();
-
-    records.forEach(record => {
-        const key =
-            `${record.day}|${record.floor}|${record.name.toLowerCase()}`;
-
-        const previous = latest.get(key);
-
-        if (
-            !previous ||
-            timeToMinutes(record.time) > timeToMinutes(previous.time) ||
-            (
-                timeToMinutes(record.time) === timeToMinutes(previous.time) &&
-                record.order > previous.order
-            )
-        ) {
-            latest.set(key, record);
-        }
-    });
-
-    return [...latest.values()];
-}
-
-/* Filters all records for the table. */
+/* ==============================
+   FILTER RECORDS
+============================== */
 
 function getAllFilteredRecords() {
     let records = [...allRecords];
@@ -277,20 +264,9 @@ function getAllFilteredRecords() {
     return records;
 }
 
-/* Filters latest observations for the summary cards. */
-
-function getFilteredRecords() {
-    return getAllFilteredRecords()
-        .filter(record =>
-            latestPerArea(allRecords).some(latest =>
-                latest.day === record.day &&
-                latest.floor === record.floor &&
-                latest.name === record.name &&
-                latest.time === record.time &&
-                latest.order === record.order
-            )
-        );
-}
+/* ==============================
+   GENERAL HELPERS
+============================== */
 
 function occupancy(record) {
     return record.percentage;
@@ -304,50 +280,133 @@ function setText(id, value) {
     }
 }
 
+/* ==============================
+   SUMMARY CARDS
+============================== */
+
 function renderSummary(records) {
-    const availableRecords = records.filter(record =>
+
+    // Only records with valid occupancy percentages
+    // can be used to identify the quietest and busiest periods.
+
+    const occupancyRecords = records.filter(record =>
         occupancy(record) !== null
     );
 
-    if (!availableRecords.length) {
-        setText("average-occupancy", "—");
-        setText("busiest-area", "—");
-        setText("busiest-detail", "No data available");
-        setText("freest-area", "—");
-        setText("freest-detail", "No data available");
-        setText("areas-count", records.length);
+    // Unique study areas, identified by floor and area name.
+
+    const uniqueAreas = new Set(
+        records.map(record =>
+            `${record.floor}|${record.name.toLowerCase()}`
+        )
+    );
+
+    // Valid seat records for average available seats.
+
+    const validSeatRecords = records.filter(record =>
+        record.total !== null &&
+        record.occupied !== null &&
+        record.total > 0 &&
+        record.occupied >= 0 &&
+        record.occupied <= record.total
+    );
+
+    /* AREAS RECORDED */
+
+    setText("areas-count", uniqueAreas.size);
+
+    setText(
+        "areas-detail",
+        uniqueAreas.size === 1
+            ? "Unique study area"
+            : "Unique study areas"
+    );
+
+    /* NO RECORDS */
+
+    if (records.length === 0) {
+        setText("quietest-time", "—");
+        setText("quietest-detail", "No observations available");
+
+        setText("busiest-time", "—");
+        setText("busiest-detail", "No observations available");
+
+        setText("average-available-seats", "—");
+        setText("average-available-detail", "No valid seat records");
+
         return;
     }
 
-    const average = availableRecords.reduce((sum, record) =>
-        sum + occupancy(record), 0
-    ) / availableRecords.length;
+    /* QUIETEST AND BUSIEST TIME */
 
-    const busiest = availableRecords.reduce((best, record) =>
-        occupancy(record) > occupancy(best) ? record : best
+    if (occupancyRecords.length === 0) {
+        setText("quietest-time", "—");
+        setText("quietest-detail", "No occupancy percentages available");
+
+        setText("busiest-time", "—");
+        setText("busiest-detail", "No occupancy percentages available");
+    } else {
+
+        const quietest = occupancyRecords.reduce((best, record) =>
+            occupancy(record) < occupancy(best) ? record : best
+        );
+
+        const busiest = occupancyRecords.reduce((best, record) =>
+            occupancy(record) > occupancy(best) ? record : best
+        );
+
+        setText(
+            "quietest-time",
+            formatTime(quietest.time)
+        );
+
+        setText(
+            "quietest-detail",
+            `${quietest.day} · Floor ${quietest.floor} · ${quietest.name} · ${occupancy(quietest).toFixed(1)}% occupied`
+        );
+
+        setText(
+            "busiest-time",
+            formatTime(busiest.time)
+        );
+
+        setText(
+            "busiest-detail",
+            `${busiest.day} · Floor ${busiest.floor} · ${busiest.name} · ${occupancy(busiest).toFixed(1)}% occupied`
+        );
+    }
+
+    /* AVERAGE AVAILABLE SEATS */
+
+    if (validSeatRecords.length === 0) {
+        setText("average-available-seats", "—");
+        setText("average-available-detail", "No valid seat records");
+
+        return;
+    }
+
+    const totalAvailableSeats = validSeatRecords.reduce(
+        (sum, record) => sum + (record.total - record.occupied),
+        0
     );
 
-    const freest = availableRecords.reduce((best, record) =>
-        occupancy(record) < occupancy(best) ? record : best
-    );
-
-    setText("average-occupancy", `${average.toFixed(1)}%`);
-    setText("busiest-area", busiest.name);
+    const averageAvailableSeats =
+        totalAvailableSeats / validSeatRecords.length;
 
     setText(
-        "busiest-detail",
-        `Floor ${busiest.floor} · ${occupancy(busiest).toFixed(1)}% occupied`
+        "average-available-seats",
+        `${averageAvailableSeats.toFixed(1)} seats`
     );
-
-    setText("freest-area", freest.name);
 
     setText(
-        "freest-detail",
-        `Floor ${freest.floor} · ${occupancy(freest).toFixed(1)}% occupied`
+        "average-available-detail",
+        `Across ${validSeatRecords.length} valid observations`
     );
-
-    setText("areas-count", records.length);
 }
+
+/* ==============================
+   STUDY AREA DROPDOWN
+============================== */
 
 function populateAreaSelect() {
     const previousValue = areaSelect.value;
@@ -383,6 +442,10 @@ function populateAreaSelect() {
     }
 }
 
+/* ==============================
+   OBSERVATION TIME DROPDOWN
+============================== */
+
 function populateTimeSelect() {
     const previousValue = timeSelect.value;
 
@@ -414,6 +477,10 @@ function populateTimeSelect() {
         timeSelect.value = times[0];
     }
 }
+
+/* ==============================
+   WEEKDAY COMPARISON CHART
+============================== */
 
 function renderWeekdayChart() {
     const container = document.getElementById("weekday-chart");
@@ -509,7 +576,9 @@ function renderWeekdayChart() {
         `At ${formatTime(selectedTime)}, the highest recorded occupancy was on ${highest.day} (${highest.percent.toFixed(1)}%), while the lowest was on ${lowest.day} (${lowest.percent.toFixed(1)}%). Missing bars indicate unavailable data.`;
 }
 
-/* Displays every observation, including time. */
+/* ==============================
+   COMPLETE OCCUPANCY TABLE
+============================== */
 
 function renderTable(records) {
     const tbody = document.getElementById("records-table");
@@ -556,17 +625,24 @@ function renderTable(records) {
     });
 }
 
-function renderPage() {
-    const summaryRecords = getFilteredRecords();
-    const tableRecords = getAllFilteredRecords();
+/* ==============================
+   RENDER COMPLETE PAGE
+============================== */
 
-    renderSummary(summaryRecords);
+function renderPage() {
+    const filteredRecords = getAllFilteredRecords();
+
+    renderSummary(filteredRecords);
     renderWeekdayChart();
-    renderTable(tableRecords);
+    renderTable(filteredRecords);
 
     statusText.textContent =
-        `${tableRecords.length} observations displayed · ${allRecords.length} source observations loaded`;
+        `${filteredRecords.length} observations displayed · ${allRecords.length} source observations loaded`;
 }
+
+/* ==============================
+   REFRESH DATA
+============================== */
 
 async function loadData() {
     if (isLoading) return;
@@ -583,6 +659,7 @@ async function loadData() {
 
         populateAreaSelect();
         populateTimeSelect();
+
         renderPage();
 
         const lastUpdated = new Intl.DateTimeFormat("en-PH", {
@@ -613,8 +690,13 @@ async function loadData() {
     }
 }
 
+/* ==============================
+   EVENT LISTENERS
+============================== */
+
 weekdaySelect.addEventListener("change", renderPage);
 floorSelect.addEventListener("change", renderPage);
+
 areaSelect.addEventListener("change", renderWeekdayChart);
 timeSelect.addEventListener("change", renderWeekdayChart);
 
@@ -627,5 +709,4 @@ document.addEventListener("visibilitychange", () => {
 });
 
 loadData();
-
 setInterval(loadData, 60000);
