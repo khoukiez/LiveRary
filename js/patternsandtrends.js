@@ -6,9 +6,7 @@ const weekdays = [
     "Tuesday",
     "Wednesday",
     "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday"
+    "Friday"
 ];
 
 let allRecords = [];
